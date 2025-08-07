@@ -1,7 +1,12 @@
+import { fetchNotes } from "@/lib/api";
 import NotesClient from "./Notes.client";
+import type { FetchNotesResponse } from "@/lib/api";
 
-export const dynamic = "force-dynamic";
+export default async function NotesPage() {
+  const initialData: FetchNotesResponse = await fetchNotes({
+    page: 1,
+    perPage: 12,
+  });
 
-export default function NotesPage() {
-  return <NotesClient />;
+  return <NotesClient initialData={initialData} />;
 }
