@@ -6,19 +6,21 @@ import { fetchNoteById } from "@/lib/api";
 import css from "@/components/NoteDetails/NoteDetails.module.css";
 
 export default function NoteDetailsClient() {
-  const params = useParams();
+  const { id } = useParams<{ id: string }>();
 
-  const idParam = params?.id;
-  const id = Array.isArray(idParam) ? idParam[0] : idParam; // <- надійно
-
-  const { data: note, isLoading, isError } = useQuery({
+  const {
+    data: note,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["note", id],
-    queryFn: () => fetchNoteById(id as string),
-    enabled: typeof id === "string" && id.length > 0,
+    queryFn: () => fetchNoteById(id),
+    enabled: Boolean(id),
+    refetchOnMount: false,
   });
 
   if (isLoading) return <p>Loading, please wait...</p>;
-  if (isError || !note) return <p>Something went wrong.</p>;
+  if (error || !note) return <p>Something went wrong.</p>;
 
   return (
     <div className={css.container}>
@@ -28,8 +30,12 @@ export default function NoteDetailsClient() {
         </div>
 
         <p className={css.tag}>{note.tag}</p>
+
         <p className={css.content}>{note.content}</p>
-        <p className={css.date}>{new Date(note.createdAt).toLocaleString()}</p>
+
+        <p className={css.date}>
+          {new Date(note.createdAt).toLocaleString()}
+        </p>
       </div>
     </div>
   );
